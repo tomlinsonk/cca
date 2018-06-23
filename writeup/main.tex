@@ -1,0 +1,111 @@
+% ****** Start of file apssamp.tex ******
+%
+%   This file is part of the APS files in the REVTeX 4.1 distribution.
+%   Version 4.1r of REVTeX, August 2010
+%
+%   Copyright (c) 2009, 2010 The American Physical Society.
+%
+%   See the REVTeX 4 README file for restrictions and more information.
+%
+% TeX'ing this file requires that you have AMS-LaTeX 2.0 installed
+% as well as the rest of the prerequisites for REVTeX 4.1
+%
+% See the REVTeX 4 README file
+% It also requires running BibTeX. The commands are as follows:
+%
+%  1)  latex apssamp.tex
+%  2)  bibtex apssamp
+%  3)  latex apssamp.tex
+%  4)  latex apssamp.tex
+%
+\documentclass[%
+ reprint,
+%superscriptaddress,
+%groupedaddress,
+%unsortedaddress,
+%runinaddress,
+%frontmatterverbose, 
+%preprint,
+%showpacs,preprintnumbers,
+%nofootinbib,
+%nobibnotes,
+%bibnotes,
+ amsmath,amssymb,
+ aps,
+%pra,
+%prb,
+%rmp,
+%prstab,
+%prstper,
+%floatfix,
+]{revtex4-1}
+
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+\usepackage{hyperref}% add hypertext capabilities
+%\usepackage[mathlines]{lineno}% Enable numbering of text and display math
+%\linenumbers\relax % Commence numbering lines
+
+%\usepackage[showframe,%Uncomment any one of the following lines to test 
+%%scale=0.7, marginratio={1:1, 2:3}, ignoreall,% default settings
+%%text={7in,10in},centering,
+%%margin=1.5in,
+%%total={6.5in,8.75in}, top=1.2in, left=0.9in, includefoot,
+%%height=10in,a5paper,hmargin={3cm,0.8in},
+%]{geometry}
+
+\begin{document}
+
+\preprint{APS/123-QED}
+
+\title{Phase Lengths in Cyclic Cellular Automata}% Force line breaks with \\
+
+\author{Kiran Tomlinson}
+\affiliation{%
+Carleton College\\
+tomlinsonk@carleton.edu
+}%
+
+\date{\today}% It is always \today, today,
+             %  but any date may be explicitly specified
+
+\begin{abstract}
+We explore the lengths of phases in the cyclic cellular automaton model of excitable media. The CCA model evolves through well-defined phases which can be rigorously identified through analysis of simulation data. We describe the empirical dependence of the phase length on parameters of the model, including the neighborhood and the number of states $k$. We find that the length of the droplet phase exhibits a power-law relation with $k$ and that other phase lengths increase linearly with $k$ across several neighborhoods.  
+\end{abstract}
+
+\maketitle
+
+
+\section{\label{sec:intro}Introduction}
+Excitable media are dynamical systems in which regions transmit an energetic state to their neighbors, but can only do so periodically. Certain 2-dimensional excitable systems develop spiral waves; canonical examples include the oscillating Belousov-Zhabotinsky reaction \cite{Keener1986} and chemical signals in \emph{Dictyostelium} amoebae \cite{Palsson1997}. These systems are governed by complex physical and chemical processes--as such, their dynamics are difficult to study directly.
+
+Due to their simplicity, cellular automata are widely used to model dynamical systems, including spiral wave excitable media. The cyclic cellular automaton (CCA) is one such model, described in \cite{Fisch1991}. The CCA model is remarkable both for its simplicity and for its rich behavior. Like other cellular automata, the CCA exists on a 2-dimensional integer lattice and consists of cells that occupy a finite number of states. The number of states $k$ is a parameter and we number them $0 \dots k-1$. States are also called \emph{types} or, in other literature, \emph{colors}.
+
+The cells are initially assigned a state uniformly at random and are then allowed to evolve in discrete time steps according to the update rule. At each step, every cell in state $i$ with a neighbor in state $i+1 \mod k$ is promoted to state $i + 1 \mod k$. The use of modular arithmetic allows cells to be promoted indefinitely and leads to the model's eponymous cyclic behavior.
+
+We can define different neighborhoods to alter the behavior of the model. The most widely used neighborhoods are the von Neumann and Moore neighborhoods. The former consists of the four directly adjacent cells (N, S, E, W) and the latter also includes the four diagonals. Depending on which neighborhood is chosen, the model either gives rise to diamond or square spiral waves for a wide range of $k$. 
+
+\subsection{CCA Phases}
+The CCA is particularly intriguing because it evolves through a sequence of distinct phases, amusingly named the \emph{debris}, \emph{droplet}, \emph{defect}, and \emph{demon} phases \cite{Fisch1991}. As long as $k$ is not too small (or too large, on a finite lattice), every CCA run follows the same pattern.
+
+\emph{Debris.} In the first phase, the random grid goes through a short burst of activity during which neighboring cells with consecutively initialized states are promoted according to the update rule. After a brief flurry of updates, most of the grid is covered by inactive and disorganized debris. 
+
+\emph{Droplets.} Some clusters of cells happen to be surrounded by cells in the correct sequence of ascending states to allow the cluster to continue to spread. These clusters--called droplets because of their circular and liquid appearance--are dominated by a small number of types that spread through the droplet in waves. As time progresses, droplets increase in size as they take over the surrounding debris. 
+
+\emph{Defects.} With high probability, a special loop configuration of cells called a defect forms at the intersection of droplets, or at the debris boundary of a droplet. Defects then give rise to spirals, which spread inexorably across the grid, wiping out any remaining debris and droplets.
+
+\emph{Demons.} Some defects contain the correct number of cells to generate period $k$ spirals whose constituent cells update at every step. These optimal spirals are known as demons. Demons absorb longer period spirals, eventually dominating the entire grid. The system then stabilizes and the demons spiral away indefinitely.
+
+These phases characterize the behavior of the CCA for a wide range of neighborhoods and values of $k$ \cite{Fisch1991Thresh}. Some basic experimentation reveals that the lengths of the phases change when when $k$ and the neighborhood are varied. Moreover, these relationships are not immediately obvious due to the complexity of the model's emergent behavior.
+
+In this paper, we empirically analyze the relationship between phase lengths in the CCA model and the value of $k$ for several neighborhoods. These phase length relations shed light on how phase transitions occur in the CCA model. 
+
+\section{Methods} 
+In order to rigorously identify the transitions between phases, we measure the number of cells updating at each step of the simulation. The 
+To identify when phase transitions occur, we use a second-derivative min/max method paired with a Savitzky-Golay filter \cite{SavitzkyGolay}. This approach is useful in identifying inflection points in noisy data.
+
+
+
+\bibliography{bibliography}
+\end{document}

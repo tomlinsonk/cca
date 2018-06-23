@@ -15,7 +15,7 @@ NW = np.array([[1,0,0],[0,-1,0],[0,0,0]])
 vn_neighbors = (N, S, E, W)
 moore_neighbors = (N, S, E, W, NE, SE, SW, NW)
 
-trials = 1000
+trials = 100
 trial_sets = 100
 steps = 500
 grid_size = 256
@@ -70,9 +70,8 @@ def format_data(trials, types_range):
 def run_trial_set(number):
     # Von Neumann Neighbor Runs
     vn_trials = {}
-    print('VN', number)
     for types in types_range:
-        print(types)
+        print('VN', number, ':', types)
         vn_trials[types] = []
         for trial in range(trials):
             vn_trials[types].append(cca_diff_sums(types, grid_size, steps, vn_neighbors))
@@ -81,10 +80,9 @@ def run_trial_set(number):
         f.write(format_data(vn_trials, types_range))
 
     # Moore Neighbor Runs
-    print('MOORE', number)
     moore_trials = {}
     for types in types_range:
-        print(types)
+        print('MOORE', number, ':', types)
         moore_trials[types] = []
         for trial in range(trials):
             moore_trials[types].append(cca_diff_sums(types, grid_size, steps, moore_neighbors))
@@ -94,7 +92,7 @@ def run_trial_set(number):
 
 
 if __name__ == '__main__':
-    pool = Pool(16)
+    pool = Pool(20)
     pool.map(run_trial_set, range(trial_sets))
     pool.close()
     pool.join()

@@ -94,7 +94,7 @@ def run_trial_set(number):
 
 
 if __name__ == '__main__':
-    pool = Pool(8)
+    pool = Pool(16)
     pool.map(run_trial_set, range(trial_sets))
     pool.close()
     pool.join()

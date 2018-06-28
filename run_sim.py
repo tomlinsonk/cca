@@ -15,11 +15,11 @@ NW = np.array([[1,0,0],[0,-1,0],[0,0,0]])
 vn_neighbors = (N, S, E, W)
 moore_neighbors = (N, S, E, W, NE, SE, SW, NW)
 
-trials = 1000
-trial_sets = 100
+trials = 32
+trial_sets = 32
 steps = 500
-grid_size = 256
-types_range = range(6, 31)
+grid_size = 128
+types_range = range(7, 28)
 
 
 def cca_diff_sums(types, grid_size, steps, neighborhood):
@@ -94,7 +94,7 @@ def run_trial_set(number):
 
 
 if __name__ == '__main__':
-    pool = Pool(16)
+    pool = Pool(8)
     pool.map(run_trial_set, range(trial_sets))
     pool.close()
     pool.join()

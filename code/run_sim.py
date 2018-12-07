@@ -68,6 +68,8 @@ def format_data(trials, types_range):
 
 
 def run_trial_set(number):
+    np.random.seed()
+    
     # Von Neumann Neighbor Runs
     vn_trials = {}
     for types in types_range:

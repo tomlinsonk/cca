@@ -12,7 +12,7 @@ import warnings
 
 warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
 
-cca_dir = '/Users/kiran/Desktop/Projects/Research/cca/'
+cca_dir = '/Users/tomlinsonk/Projects/Research/cca/'
 
 def main(neighborhood, size):
     vn = neighborhood == 'vn'
@@ -62,64 +62,77 @@ def main(neighborhood, size):
 
     phase_points = {k: [] for k in k_range}
 
+    showing = False
     print('Finding phase lengths...')
     for k in k_range:
+        print('Unique trials:', len(set(tuple(trial) for trial in data[k])))
 
-        means = np.mean(data[k], axis=0)
-        min_diff = np.argmin(means)
+        for trial in range(len(data[k])):
+
+            min_diff = np.argmin(data[k][trial])
+            
+            # deriv1 = np.gradient(means, 1)[min_step[k]:]
+
+            # print(data[k][trial])
+
+            deriv2 = np.gradient(np.gradient(data[k][trial], 1), 1)[min_step[k]:]
+            direct_deriv = savgol_filter(data[k][trial], widths[k], 3, mode='nearest', deriv=2)[min_step[k]:]
+
+            min_deriv = np.argmin(direct_deriv) + min_step[k]
+            max_deriv = np.argmax(direct_deriv) + min_step[k]
+
+            debris_lengths[k].append(min_diff)
+            droplet_lengths[k].append(max_deriv - min_diff)
+            defect_lengths[k].append(min_deriv - max_deriv)
+
+            if max_deriv - min_diff < 0 or min_deriv - max_deriv < 0:
+                showing = True
+            # print(trial)
+
+            # if showing and trial % 32 == 12:
+            #     if size == 128:
+            #         yticks = [0, 4000, 8000, 12000, 16000]
+            #     elif size == 256:
+            #         yticks = [0, 15000, 30000, 45000, 60000]
+            #     elif size == 512:
+            #         yticks = [0, 50000, 100000, 150000, 200000, 250000, 300000]
+
+
+            #     fig, axes = plt.subplots(nrows=2, figsize=(5, 3))
+            #     plt.locator_params(nbins=5)       
+
+            #     axes[0].plot(range(500), data[k][trial])
+            #     axes[0].scatter(min_diff, np.min(data[k][trial]))
+            #     axes[0].scatter(min_deriv, data[k][trial][min_deriv])
+            #     axes[0].scatter(max_deriv, data[k][trial][max_deriv])
+            #     axes[0].set_ylabel('$\Delta(t)$')
+            #     axes[0].set_xlim(0, 500)
+            #     axes[0].set_ylim(ymin=0)
+            #     if size == 128:
+            #         axes[0].set_ylim(ymax=17000)
+
+            #     axes[1].plot(range(min_step[k], 500), deriv2, label='Raw derivative')
+            #     axes[1].plot(range(min_step[k], 500), direct_deriv, color='black', label='Savitzky-Golay output')
+            #     axes[1].set_ylabel("$\Delta''(t)$")
+            #     axes[1].set_xlim(0, 500)
+
+
+            #     axes[1].legend(loc='upper right', fontsize=8)
+            #     axes[0].tick_params(axis='x', which='major', labelsize=8)
+            #     axes[1].tick_params(axis='both', which='major', labelsize=8)
+            #     plt.sca(axes[0])
+            #     plt.yticks(yticks, yticks, fontsize=8)
+            #     plt.sca(axes[1])
+
+            #     plt.suptitle('$\Delta(t)$ curve ($k={}$, {} neighborhood)'.format(k, 'von Neumann' if vn else 'Moore'))
+            #     plt.xlabel('Step ($t$)')
+            #     plt.yticks(rotation='horizontal')
+            #     # os.makedirs(cca_dir + 'plots/diff_curves/{}_{}/'.format(size, neighborhood), exist_ok=True)
+            #     # plt.savefig(cca_dir + 'plots/diff_curves/{0}_{1}/{0}_{1}_k_{2}.pdf'.format(size, neighborhood, k), bbox_inches='tight')
+            #     plt.show()
+            #     plt.close()
+
         
-
-        deriv2 = np.gradient(np.gradient(means, 1), 1)[min_step[k]:]
-        direct_deriv = savgol_filter(means, widths[k], 3, mode='nearest', deriv=2)[min_step[k]:]
-
-        min_deriv = np.argmin(direct_deriv, axis=0) + min_step[k]
-        max_deriv = np.argmax(direct_deriv, axis=0) + min_step[k]
-
-        if size == 128:
-            yticks = [0, 4000, 8000, 12000, 16000]
-        elif size == 256:
-            yticks = [0, 15000, 30000, 45000, 60000]
-        elif size == 512:
-            yticks = [0, 50000, 100000, 150000, 200000, 250000, 300000]
-
-
-
-        fig, axes = plt.subplots(nrows=2, figsize=(5, 3))
-        plt.locator_params(nbins=5)       
-
-        axes[0].plot(range(500), means)
-        axes[0].scatter(min_diff, np.min(means))
-        axes[0].scatter(min_deriv, means[min_deriv])
-        axes[0].scatter(max_deriv, means[max_deriv])
-        axes[0].set_ylabel('$\Delta(t)$')
-        axes[0].set_xlim(0, 500)
-        axes[0].set_ylim(ymin=0)
-        if size == 128:
-            axes[0].set_ylim(ymax=17000)
-
-        axes[1].plot(range(min_step[k], 500), deriv2, label='Raw derivative')
-        axes[1].plot(range(min_step[k], 500), direct_deriv, color='black', label='Savitzky-Golay output')
-        axes[1].set_ylabel('$\\frac{d}{d^2 t}\Delta(t)$')
-        axes[1].set_xlim(0, 500)
-
-
-        axes[1].legend(loc='lower right', fontsize=8)
-        axes[0].tick_params(axis='x', which='major', labelsize=8)
-        axes[1].tick_params(axis='both', which='major', labelsize=8)
-        plt.sca(axes[0])
-        plt.yticks(yticks, yticks, fontsize=8)
-        plt.sca(axes[1])
-
-        plt.suptitle('$\Delta(t)$ curve ($k={}$, {} neighborhood)'.format(k, 'von Neumann' if vn else 'Moore'))
-        plt.xlabel('Step ($t$)')
-        plt.yticks(rotation='horizontal')
-        os.makedirs(cca_dir + 'plots/diff_curves/{}_{}/'.format(size, neighborhood), exist_ok=True)
-        plt.savefig(cca_dir + 'plots/diff_curves/{0}_{1}/{0}_{1}_k_{2}.pdf'.format(size, neighborhood, k), bbox_inches='tight')
-        # plt.show()
-
-        debris_lengths[k].append(min_diff)
-        droplet_lengths[k].append(max_deriv - min_diff)
-        defect_lengths[k].append(min_deriv - max_deriv)
 
     print('Pickling results...')
     with open(cca_dir + '/pickles/{}_{}.pkl'.format(size, neighborhood), 'wb') as f:

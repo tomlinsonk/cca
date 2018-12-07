@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import ndimage
 from multiprocessing import Pool
+from itertools import product
 
 
 N = np.array([[0,1,0],[0,-1,0],[0,0,0]])
@@ -18,8 +19,7 @@ moore_neighbors = (N, S, E, W, NE, SE, SW, NW)
 trials = 32
 trial_sets = 32
 steps = 500
-grid_size = 128
-types_range = range(7, 28)
+types_range = range(7, 22)
 
 
 def cca_diff_sums(types, grid_size, steps, neighborhood):
@@ -67,34 +67,35 @@ def format_data(trials, types_range):
 
 
 
-def run_trial_set(number):
+def run_trial_set(args):
+    grid_size, number = args
     np.random.seed()
     
     # Von Neumann Neighbor Runs
     vn_trials = {}
     for types in types_range:
-        print('VN', number, ':', types)
+        print(grid_size, 'VN', number, ':', types)
         vn_trials[types] = []
         for trial in range(trials):
             vn_trials[types].append(cca_diff_sums(types, grid_size, steps, vn_neighbors))
 
-    with open('vn_neighbor_diff_data_{}.csv'.format(number), 'w') as f:
+    with open('{}_vn_neighbor_diff_data_{}.csv'.format(grid_size, number), 'w') as f:
         f.write(format_data(vn_trials, types_range))
 
     # Moore Neighbor Runs
     moore_trials = {}
     for types in types_range:
-        print('MOORE', number, ':', types)
+        print(grid_size, 'MOORE', number, ':', types)
         moore_trials[types] = []
         for trial in range(trials):
             moore_trials[types].append(cca_diff_sums(types, grid_size, steps, moore_neighbors))
 
-    with open('moore_neighbor_diff_data_{}.csv'.format(number), 'w') as f:
+    with open('{}_moore_neighbor_diff_data_{}.csv'.format(grid_size, number), 'w') as f:
         f.write(format_data(moore_trials, types_range))
 
 
 if __name__ == '__main__':
-    pool = Pool(8)
-    pool.map(run_trial_set, range(trial_sets))
+    pool = Pool(16)
+    pool.map(run_trial_set, product([128, 256, 512], range(trial_sets)))
     pool.close()
     pool.join()

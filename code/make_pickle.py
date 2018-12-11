@@ -125,7 +125,7 @@ def main(neighborhood, size):
                 plt.yticks(rotation='horizontal')
                 # os.makedirs(cca_dir + 'plots/diff_curves/{}_{}/'.format(size, neighborhood), exist_ok=True)
                 # plt.savefig(cca_dir + 'plots/diff_curves/{0}_{1}/{0}_{1}_k_{2}.pdf'.format(size, neighborhood, k), bbox_inches='tight')
-                plt.show()
+                # plt.show()
                 plt.close()
 
                 continue

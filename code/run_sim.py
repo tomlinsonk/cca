@@ -2,6 +2,7 @@ import numpy as np
 from scipy import ndimage
 from multiprocessing import Pool
 from itertools import product
+import time
 
 
 N = np.array([[0,1,0],[0,-1,0],[0,0,0]])
@@ -19,7 +20,8 @@ moore_neighbors = (N, S, E, W, NE, SE, SW, NW)
 trials = 32
 trial_sets = 32
 steps = 500
-types_range = range(7, 22)
+threads = 20
+types_range = range(7, 20)
 
 
 def cca_diff_sums(types, grid_size, steps, neighborhood):
@@ -40,6 +42,7 @@ def cca_diff_sums(types, grid_size, steps, neighborhood):
 
     return diff_sums
 
+
 def cca_inert_bonds(types, grid_size, steps, neighborhood):
     inerts = []
     grid = np.random.randint(types, size=(grid_size, grid_size))
@@ -57,6 +60,7 @@ def cca_inert_bonds(types, grid_size, steps, neighborhood):
 
     return inerts
 
+
 def format_data(trials, types_range):
     out = 'types, trial, data...\n'
     for types in types_range:
@@ -64,7 +68,6 @@ def format_data(trials, types_range):
             out += '{}, {}, {}\n'.format(types, i,','.join(map(str, trial)))
 
     return out
-
 
 
 def run_trial_set(args):
@@ -95,7 +98,9 @@ def run_trial_set(args):
 
 
 if __name__ == '__main__':
-    pool = Pool(16)
-    pool.map(run_trial_set, product([128, 256, 512], range(trial_sets)))
+    start = time.time()
+    pool = Pool(threads)
+    pool.map(run_trial_set, product([1024], range(trial_sets)))
     pool.close()
     pool.join()
+    print('Runtime:', time.time() - start)

@@ -1,6 +1,7 @@
+# Ignore everything
+/*
 .DS_Store
-*.out
-*.aux
-*.log
-*.bbl
-build
+
+# Except
+!code
+

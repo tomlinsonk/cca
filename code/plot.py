@@ -47,7 +47,7 @@ def plot(phase, data, neighborhood):
     log_k = [np.log(k) for k in k_range for point in np.log(data[k])]
 
     log_error = [np.std(data[k], ddof=1) / np.mean(data[k]) for k in k_range]
-    print(log_error)
+    # print(log_error)
 
 
     popt, pcov = curve_fit(linear_model, log_k, log_data)

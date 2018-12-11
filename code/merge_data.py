@@ -1,11 +1,15 @@
 from glob import glob
+import sys
 
 
-out = ''
+if input('Merging files matching {} into {}. Confirm? (y/n) '.format(sys.argv[1], sys.argv[2])).strip().lower() == 'y':
+	out = ''
 
-for in_file in glob('*.csv'):
-    with open(in_file) as f:
-        out += ''.join(f.readlines()[1:])
+	for in_file in glob(sys.argv[1] + '*'):
+	    with open(in_file) as f:
+	        out += ''.join(f.readlines()[1:])
 
-with open('128_moore_diff.csv', 'w') as f:
-    f.write(out)
+	with open(sys.argv[2], 'w') as f:
+	    f.write(out)
+else:
+	print('Cancelled.')
